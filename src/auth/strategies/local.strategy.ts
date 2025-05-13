@@ -1,4 +1,3 @@
-
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -11,20 +10,23 @@ import { validate } from 'class-validator';
 export class LocalStrategy extends PassportStrategy(Strategy, 'local-auth') {
   constructor(private usersService: UsersService) {
     super({
-        usernameField: "email",
-        passwordField: "password"
+      usernameField: 'email',
+      passwordField: 'password',
     });
   }
 
   async validate(email: string, password: string) {
     const loginDto = plainToInstance(LoginDto, { email, password });
     const errors = await validate(loginDto);
-    
+
     if (errors.length > 0) {
       throw new BadRequestException(errors);
     }
 
-    const user = await this.usersService.validateUserCredentials(email, password);
+    const user = await this.usersService.validateUserCredentials(
+      email,
+      password,
+    );
     if (!user) {
       throw new BadRequestException('Invalid credentials');
     }
@@ -32,4 +34,3 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local-auth') {
     return user;
   }
 }
- 
